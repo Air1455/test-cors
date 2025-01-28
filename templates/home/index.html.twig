@@ -17,12 +17,12 @@
 
 {% block javascripts %}
     <script>
-        fetch('https://127.0.0.1:8000/api/login_check', {
+        fetch('https://test.poweg.fr/api/login_check', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({username: 'R1', password: '0000'})
+            body: JSON.stringify({username: 'R5', password: '0000'})
         }).then(resp=> resp.json()).then(resp=> {
             const token= resp.token
             if(!token){
