@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+    <style>
+        .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+        .example-line { padding: 2px 30px; }
+    </style>
+
+    <div class="example-wrapper">
+        <h1>Voici mon appel à l'api :</h1>
+        <div class="example-line">Mon nom : <span id="name"></span></div>
+        <div class="example-line">Mon titre : <span id="title"></span></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        fetch('https://127.0.0.1:8000/api/login_check', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({username: 'R1', password: '0000'})
+        }).then(resp=> resp.json()).then(resp=> {
+            const token= resp.token
+            if(!token){
+                document.getElementById('name').textContent= resp.message
+                return
+            }
+            fetch('https://test.poweg.fr/api/tests', {
+                headers: {
+                    'Content-Type': 'application/json+ld',
+                    'Authorization': `Bearer ${token}`
+                },
+            }).then(resp=> {
+                    const blocName= document.getElementById('name')
+                    const blocTitle= document.getElementById('title')
+                    resp.json().then(data=> {
+                        if(!data.member) throw new Error(data.message)
+                        const firstRow= data.member[0]
+                        blocName.textContent = firstRow.name
+                        blocTitle.textContent = firstRow.title
+                    }).catch(err=> {
+                        const span= document.getElementById('name')
+                        span.textContent = err
+                    })
+                })
+                .catch(err=> {
+                    console.log(err)
+                    const span= document.getElementById('name')
+                    resp.json().then(data=> span.textContent = JSON.stringify(err, null, 2))
+                })
+        })
+
+    </script>
+{% endblock %}
